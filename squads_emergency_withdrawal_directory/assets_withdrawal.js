@@ -2,25 +2,29 @@ const anchor = require('@project-serum/anchor');
 const { PublicKey, SystemProgram, TOKEN_PROGRAM_ID, Token } = anchor.web3;
 const BN = require('bn.js');
 
-// Define wallet keypair JSON paths
-const wallet1 = new anchor.Wallet(anchor.web3.Keypair.fromSecretKey(new Uint8Array(require("./keys/wallet_1.json"))));
-const wallet2 = new anchor.Wallet(anchor.web3.Keypair.fromSecretKey(new Uint8Array(require("./keys/wallet_2.json"))));
-const wallet3 = new anchor.Wallet(anchor.web3.Keypair.fromSecretKey(new Uint8Array(require("./keys/wallet_3.json"))));
+// Wallet keypair JSON paths
+const wallet1 = new anchor.Wallet(anchor.web3.Keypair.fromSecretKey(new Uint8Array(require("./keys/wallet1.json"))));
+const wallet2 = new anchor.Wallet(anchor.web3.Keypair.fromSecretKey(new Uint8Array(require("./keys/wallet2.json"))));
+const wallet3 = new anchor.Wallet(anchor.web3.Keypair.fromSecretKey(new Uint8Array(require("./keys/wallet3.json"))));
 
-// Set up the provider for Anchor
+// Provider for Anchor
 const provider = new anchor.AnchorProvider(anchor.web3.Connection("https://api.mainnet-beta.solana.com"), wallet1, { commitment: "confirmed" });
 anchor.setProvider(provider);
 
-// Set up the program instance
+// Program instance
 const program = anchor.workspace.MyAnchorProject; // Make sure this matches your actual project name
 
-// Specify the token details or SOL withdrawal
-const tokenAddress = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"; // Set to USDC address or "0" for SOL
-const destinationPublicKey = wallet1.publicKey; // Assuming you're withdrawing to wallet_1
+// Token details or SOL withdrawal (Token ID or "0" for native currency SOL)
+const tokenAddress = "0";
+const destinationPublicKey = wallet1.publicKey; // Withdrawal goes to Wallet 1
+
+// Getting Multisig Adress
+const fs = require('fs');
+const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
 async function main() {
-    // Fetch the multisig address and its account data
-    const multisigAddress = new PublicKey("MULTISIG_ADDRESS_HERE"); // Replace with your multisig address
+
+    const multisigAddress = new PublicKey(config.multisigAddress); // multisig address
     const multisigAccount = await program.account.multisig.fetch(multisigAddress);
     
     // Get the next transaction index
