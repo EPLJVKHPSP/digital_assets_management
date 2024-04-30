@@ -1,14 +1,16 @@
 const anchor = require('@project-serum/anchor');
 const { PublicKey, SystemProgram, TOKEN_PROGRAM_ID, Token } = anchor.web3;
 const BN = require('bn.js');
+const fs = require('fs');
+const { setTimeout } = require('timers/promises'); // For delay
 
 // Wallet keypair JSON paths
 const wallet1 = new anchor.Wallet(anchor.web3.Keypair.fromSecretKey(new Uint8Array(require("./keys/wallet1.json"))));
 const wallet2 = new anchor.Wallet(anchor.web3.Keypair.fromSecretKey(new Uint8Array(require("./keys/wallet2.json"))));
-const wallet3 = new anchor.Wallet(anchor.web3.Keypair.fromSecretKey(new Uint8Array(require("./keys/wallet3.json"))));
 
 // Provider for Anchor
-const provider = new anchor.AnchorProvider(anchor.web3.Connection("https://api.mainnet-beta.solana.com"), wallet1, { commitment: "confirmed" });
+const connection = new anchor.web3.Connection("https://api.mainnet-beta.solana.com");
+const provider = new anchor.AnchorProvider(connection, wallet1, { commitment: "confirmed" });
 anchor.setProvider(provider);
 
 // Program instance
@@ -18,16 +20,19 @@ const program = anchor.workspace.MyAnchorProject; // Make sure this matches your
 const tokenAddress = "0";
 const destinationPublicKey = wallet1.publicKey; // Withdrawal goes to Wallet 1
 
-// Getting Multisig Adress
-const fs = require('fs');
-const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+// Amount to withdraw (in lamports or token smallest unit)
+// 1 SOL = 1,000,000,000 lamports (1 billion lamports)
+// 1 USDC = 1,000,000 units (token smallest units)
+const amount = new BN(100_000_000); 
+
+// Getting Multisig Address
+const config = JSON.parse(fs.readFileSync('./keys/config.json', 'utf8'));
 
 async function main() {
-
-    const multisigAddress = new PublicKey(config.multisigAddress); // multisig address
+    const multisigAddress = new PublicKey(config.multisigAddress); // Multisig address
     const multisigAccount = await program.account.multisig.fetch(multisigAddress);
-    
-    // Get the next transaction index
+
+    // Getting the next transaction index
     const transactionIndex = new BN(multisigAccount.transactionIndex).addn(1);
 
     // Derive the transaction PDA
@@ -40,7 +45,7 @@ async function main() {
     let transactionInstruction;
 
     if (tokenAddress === "0") {
-        // Handle SOL withdrawal
+        // SOL withdrawal
         const balance = await provider.connection.getBalance(multisigAddress);
         transactionInstruction = SystemProgram.transfer({
             fromPubkey: multisigAddress,
@@ -48,7 +53,7 @@ async function main() {
             lamports: balance
         });
     } else {
-        // Handle Token withdrawal
+        // Token withdrawal
         const tokenAccountInfo = await getTokenAccount(provider, multisigAddress, new PublicKey(tokenAddress));
         const tokenBalance = tokenAccountInfo.amount;
 
@@ -70,7 +75,7 @@ async function main() {
         );
     }
 
-    // Create the transaction and attach the instruction
+    console.log("Creating transaction...");
     await program.rpc.createTransaction({
         accounts: {
             multisig: multisigAddress,
@@ -80,11 +85,14 @@ async function main() {
         instructions: [transactionInstruction]
     });
 
-    // Approvals from other wallets
-    await approveTransaction(wallet2, multisigAddress, transactionPDA);
-    await approveTransaction(wallet3, multisigAddress, transactionPDA);
+    console.log("Transaction automatically approved by wallet1...");
+    
+    console.log("Waiting for wallet2 approval...");
+    await setTimeout(2 * 60 * 1000); // 2-minute delay
 
-    // Execute the transaction
+    await approveTransaction(wallet2, multisigAddress, transactionPDA);
+
+    console.log("Executing transaction...");
     await program.rpc.executeTransaction({
         accounts: {
             multisig: multisigAddress,
@@ -97,7 +105,6 @@ async function main() {
 }
 
 async function approveTransaction(wallet, multisigAddress, transactionPDA) {
-    // Create a transaction to approve the existing one
     const tx = new Transaction().add(
         program.instruction.approveTransaction({
             accounts: {
@@ -108,12 +115,10 @@ async function approveTransaction(wallet, multisigAddress, transactionPDA) {
         })
     );
 
-    // Send and confirm the transaction
     await provider.sendAndConfirm(tx, [wallet.payer]);
 }
 
 async function getTokenAccount(provider, owner, mint) {
-    // Fetch the token account associated with the owner and mint
     const accounts = await provider.connection.getTokenAccountsByOwner(owner, { mint: mint });
     return accounts.value[0].account.data.parsed.info;
 }
