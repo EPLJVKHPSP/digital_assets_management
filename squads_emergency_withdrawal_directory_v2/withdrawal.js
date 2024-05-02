@@ -3,6 +3,7 @@ import { Keypair, SystemProgram } from '@solana/web3.js';
 import { Wallet } from '@sqds/sdk';
 import BN from 'bn.js';
 import { wallet1PrivateKey, wallet2PrivateKey, vaultPublicKey } from './keys.js';
+console.log(Squads); // Log the Squads object
 async function withdrawFromVault(amount) {
     // Create wallets from the provided private keys
     const wallet1Keypair = Keypair.fromSecretKey(wallet1PrivateKey);
