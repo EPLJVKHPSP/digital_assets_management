@@ -8,7 +8,12 @@
     "build": "tsc",
     "start": "node withdrawal.js"
   },
-  "keywords": ["Solana", "Squads", "Multisig", "Withdrawal"],
+  "keywords": [
+    "Solana",
+    "Squads",
+    "Multisig",
+    "Withdrawal"
+  ],
   "author": "Arslan",
   "license": "ISC",
   "dependencies": {

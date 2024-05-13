@@ -17,8 +17,8 @@ async function withdrawFromVault(amount: number) {
     const rpcEndpoint = "https://api.mainnet-beta.solana.com"; // Mainnet RPC endpoint
 
     // Establish connection to Solana mainnet
-    const squads1 = Squads.endpoint(rpcEndpoint, wallet1);
-    const squads2 = Squads.endpoint(rpcEndpoint, wallet2);
+    const squads1 = Squads.default.endpoint(rpcEndpoint, wallet1);
+    const squads2 = Squads.default.endpoint(rpcEndpoint, wallet2);
 
     const multisigPublicKey = await getMultisigPublicKey(vaultPublicKey);
 

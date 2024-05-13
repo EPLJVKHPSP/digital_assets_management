@@ -1,9 +1,13 @@
+// withdrawal.js
+
 import Squads, { getAuthorityPDA, DEFAULT_MULTISIG_PROGRAM_ID } from '@sqds/sdk';
-import { Keypair, SystemProgram } from '@solana/web3.js';
+import { Keypair, SystemProgram, PublicKey } from '@solana/web3.js';
 import { Wallet } from '@sqds/sdk';
 import BN from 'bn.js';
 import { wallet1PrivateKey, wallet2PrivateKey, vaultPublicKey } from './keys.js';
+
 console.log(Squads); // Log the Squads object
+
 async function withdrawFromVault(amount) {
     // Create wallets from the provided private keys
     const wallet1Keypair = Keypair.fromSecretKey(wallet1PrivateKey);
@@ -12,8 +16,8 @@ async function withdrawFromVault(amount) {
     const wallet2 = new Wallet(wallet2Keypair);
     const rpcEndpoint = "https://api.mainnet-beta.solana.com"; // Mainnet RPC endpoint
     // Establish connection to Solana mainnet
-    const squads1 = Squads.endpoint(rpcEndpoint, wallet1);
-    const squads2 = Squads.endpoint(rpcEndpoint, wallet2);
+    const squads1 = Squads.default.endpoint(rpcEndpoint, wallet1);
+    const squads2 = Squads.default.endpoint(rpcEndpoint, wallet2);
     const multisigPublicKey = await getMultisigPublicKey(vaultPublicKey);
     // Create a transaction to withdraw from the vault
     const multisigTransaction = await squads1.createTransaction(multisigPublicKey, 1);
@@ -36,12 +40,17 @@ async function withdrawFromVault(amount) {
     const postExecuteState = await squads1.getTransaction(multisigTransaction.publicKey);
     console.log('Transaction state:', postExecuteState.status);
 }
+
 async function getMultisigPublicKey(vaultPublicKey) {
-    const [multisigPublicKey] = await getAuthorityPDA(vaultPublicKey, new BN(1), DEFAULT_MULTISIG_PROGRAM_ID);
+    // Ensure vaultPublicKey is a PublicKey object
+    const vaultPubKey = new PublicKey(vaultPublicKey);
+    const [multisigPublicKey] = await getAuthorityPDA(vaultPubKey, new BN(1), DEFAULT_MULTISIG_PROGRAM_ID);
     return multisigPublicKey;
 }
+
 // Replace with the amount to withdraw in lamports
 const amount = 500000000; // 0.5 SOL
+
 withdrawFromVault(amount)
     .then(() => console.log("Transaction completed"))
     .catch((e) => console.error("Error:", e));
