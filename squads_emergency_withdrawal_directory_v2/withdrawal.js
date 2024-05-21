@@ -6,51 +6,69 @@ import { Wallet } from '@sqds/sdk';
 import BN from 'bn.js';
 import { wallet1PrivateKey, wallet2PrivateKey, vaultPublicKey } from './keys.js';
 
-console.log(Squads); // Log the Squads object
+console.log('Squads SDK Loaded:', Squads); // Log the Squads SDK object
 
 async function withdrawFromVault(amount) {
-    // Create wallets from the provided private keys
+    console.log('Initializing wallet keypairs...');
     const wallet1Keypair = Keypair.fromSecretKey(wallet1PrivateKey);
     const wallet2Keypair = Keypair.fromSecretKey(wallet2PrivateKey);
+
+    console.log('Creating Wallet instances...');
     const wallet1 = new Wallet(wallet1Keypair);
     const wallet2 = new Wallet(wallet2Keypair);
+
+    console.log('Setting up RPC endpoint...');
     const rpcEndpoint = "https://api.mainnet-beta.solana.com"; // Mainnet RPC endpoint
-    // Establish connection to Solana mainnet
+
+    console.log('Establishing connection to Solana mainnet with Wallet 1...');
     const squads1 = Squads.default.endpoint(rpcEndpoint, wallet1);
+    console.log('Establishing connection to Solana mainnet with Wallet 2...');
     const squads2 = Squads.default.endpoint(rpcEndpoint, wallet2);
+
+    console.log('Fetching Multisig Public Key...');
     const multisigPublicKey = await getMultisigPublicKey(vaultPublicKey);
-    // Create a transaction to withdraw from the vault
+
+    console.log('Creating transaction...');
     const multisigTransaction = await squads1.createTransaction(multisigPublicKey, 1);
+    console.log(`Transaction created with ID: ${multisigTransaction.publicKey.toString()}`);
+
+    console.log('Building transfer instruction...');
     const transferSolIx = SystemProgram.transfer({
         fromPubkey: vaultPublicKey,
         toPubkey: wallet1Keypair.publicKey,
         lamports: amount, // Amount to withdraw in lamports
     });
-    // Add the instruction to the transaction
+
+    console.log('Adding instruction to transaction...');
     await squads1.addInstruction(multisigTransaction.publicKey, transferSolIx);
-    // Activate the transaction
+
+    console.log('Activating transaction...');
     await squads1.activateTransaction(multisigTransaction.publicKey);
-    // Approve the transaction with Wallet 1
+
+    console.log('Approving transaction with Wallet 1...');
     await squads1.approveTransaction(multisigTransaction.publicKey);
-    // Approve the transaction with Wallet 2
+
+    console.log('Approving transaction with Wallet 2...');
     await squads2.approveTransaction(multisigTransaction.publicKey);
-    // Execute the transaction
+
+    console.log('Executing transaction...');
     await squads1.executeTransaction(multisigTransaction.publicKey);
-    // Check the transaction status
+
+    console.log('Fetching transaction status...');
     const postExecuteState = await squads1.getTransaction(multisigTransaction.publicKey);
     console.log('Transaction state:', postExecuteState.status);
 }
 
 async function getMultisigPublicKey(vaultPublicKey) {
-    // Ensure vaultPublicKey is a PublicKey object
+    console.log('Validating and converting vault public key...');
     const vaultPubKey = new PublicKey(vaultPublicKey);
+    console.log('Fetching authority PDA...');
     const [multisigPublicKey] = await getAuthorityPDA(vaultPubKey, new BN(1), DEFAULT_MULTISIG_PROGRAM_ID);
     return multisigPublicKey;
 }
 
-// Replace with the amount to withdraw in lamports
 const amount = 500000000; // 0.5 SOL
-
+console.log(`Initiating withdrawal of ${amount} lamports...`);
 withdrawFromVault(amount)
-    .then(() => console.log("Transaction completed"))
-    .catch((e) => console.error("Error:", e));
+    .then(() => console.log("Transaction completed successfully."))
+    .catch((e) => console.error("Error during transaction:", e));
