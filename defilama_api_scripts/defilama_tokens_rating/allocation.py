@@ -59,13 +59,13 @@ def save_allocation_summary_to_csv(protocols, weights, total_allocation, output_
 
 def main():
     """Main function to load data, perform calculations, and save summary to CSV."""
-    filepath = 'protocols.csv'  # Path to the CSV file
+    filepath = 'tokens.csv'  # Path to the CSV file
     output_filepath = 'allocation_summary.csv'  # Output CSV file path
     total_allocation = 10000   # Total amount to allocate in dollars
 
     protocols_df = load_data(filepath)
     ratings = protocols_df['Rating'].values
-    protocols = protocols_df['Protocol'].tolist()
+    protocols = protocols_df['Token-Name'].tolist()
 
     inverted_risk_scores = calculate_inverted_risk_scores(ratings)
     Sigma = create_risk_matrix(inverted_risk_scores)

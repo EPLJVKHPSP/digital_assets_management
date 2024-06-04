@@ -1,10 +1,9 @@
-Token,Allocation ($),Weight (%)
-aave,3965.48,39.65
-curve-finance,1249.47,12.49
-uniswap,2206.21,22.06
-morpho,991.76,9.92
-trader-joe,299.09,2.99
-kamino,557.13,5.57
-ethena,433.14,4.33
-stargate,175.74,1.76
-ramses-exchange,121.99,1.22
+Protocol,Allocation ($),Weight (%)
+wsteth,1987.32,19.87
+steth,3609.85,36.10
+eeth,2379.88,23.80
+ezeth,385.07,3.85
+reth,759.58,7.60
+cbeth,356.99,3.57
+meth,303.55,3.04
+rseth,217.76,2.18
