@@ -40,12 +40,11 @@ def risk_contributions(weights, Sigma):
     marginal_contributions = np.dot(Sigma, weights)
     return weights * marginal_contributions / total_risk
 
-def save_allocation_summary_to_csv(protocols, ratings, weights, total_allocation, output_filepath):
-    """Save the allocation summary to a CSV file sorted by ratings."""
+def save_allocation_summary_to_csv(protocols, weights, total_allocation, output_filepath):
+    """Save the allocation summary to a CSV file formatted to two decimal places."""
     dollar_allocation = weights * total_allocation
     summary = pd.DataFrame({
         'Protocol': protocols,
-        'Rating': ratings,
         'Allocation ($)': dollar_allocation,
         'Weight (%)': weights * 100
     })
@@ -54,22 +53,19 @@ def save_allocation_summary_to_csv(protocols, ratings, weights, total_allocation
     summary['Allocation ($)'] = summary['Allocation ($)'].apply(lambda x: f"{x:.2f}")
     summary['Weight (%)'] = summary['Weight (%)'].apply(lambda x: f"{x:.2f}")
 
-    # Sort by Rating in descending order (higher ratings come first)
-    summary = summary.sort_values(by='Rating', ascending=False)
-
     # Save to CSV
     summary.to_csv(output_filepath, index=False)
     print(f"Allocation summary saved to {output_filepath}")
 
 def main():
     """Main function to load data, perform calculations, and save summary to CSV."""
-    filepath = 'protocols.csv'  # Path to the CSV file
+    filepath = 'pools.csv'  # Path to the CSV file
     output_filepath = 'allocation_summary.csv'  # Output CSV file path
     total_allocation = 10000   # Total amount to allocate in dollars
 
     protocols_df = load_data(filepath)
     ratings = protocols_df['Rating'].values
-    protocols = protocols_df['Protocol'].tolist()
+    protocols = protocols_df['Pool'].tolist()
 
     inverted_risk_scores = calculate_inverted_risk_scores(ratings)
     Sigma = create_risk_matrix(inverted_risk_scores)
@@ -82,7 +78,7 @@ def main():
     result = optimize_weights(Sigma_norm, initial_weights, constraints, bounds)
     optimal_weights = result.x
 
-    save_allocation_summary_to_csv(protocols, ratings, optimal_weights, total_allocation, output_filepath)
+    save_allocation_summary_to_csv(protocols, optimal_weights, total_allocation, output_filepath)
 
 if __name__ == '__main__':
     main()

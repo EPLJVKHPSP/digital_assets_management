@@ -3,7 +3,7 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
-const protocolFile = 'protocols.csv';
+const protocolFile = './data/protocols.csv'; // Make sure this path is correct based on where you run your node script from
 
 async function fetchRatingForProtocol(protocol) {
     const url = `https://api.llama.fi/protocol/${protocol}`;
@@ -33,7 +33,7 @@ async function updateRatings() {
             protocols.push(row);
         })
         .on('end', async () => {
-            console.log('CSV file successfully processed');
+            console.log('CSV with Protocols successfully processed');
 
             // Fetch and update ratings for all protocols
             for (let protocol of protocols) {
@@ -42,9 +42,7 @@ async function updateRatings() {
             }
 
             // Sort protocols by Rating in descending order before writing to CSV
-            protocols.sort((a, b) => {
-                return (b.Rating === 'Error fetching data' ? -1 : parseFloat(b.Rating)) - (a.Rating === 'Error fetching data' ? -1 : parseFloat(a.Rating));
-            });
+            protocols.sort((a, b) => (b.Rating === 'Error fetching data' ? -1 : parseFloat(b.Rating)) - (a.Rating === 'Error fetching data' ? -1 : parseFloat(a.Rating)));
 
             // Write updated data back to CSV
             const csvWriter = createCsvWriter({
@@ -56,11 +54,9 @@ async function updateRatings() {
                 ]
             });
 
-            csvWriter.writeRecords(protocols)
-                .then(() => {
-                    console.log('Ratings updated and written to file successfully');
-                });
+            await csvWriter.writeRecords(protocols); // Ensure to await this promise
+            console.log('Protocols Ratings updated and written to file successfully');
         });
 }
 
-updateRatings();
+module.exports.updateProtocolsRatings = updateRatings;  // Correctly export the function
