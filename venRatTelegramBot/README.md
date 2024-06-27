@@ -4,7 +4,7 @@ This documentation outlines the scripts and processes involved in the Venture Ra
 
 Overview of Scripts
 
-	1.	pools_data_request.js
+	1.pools_data_request.js
 	
     Purpose: Fetches and updates pool data from DeFi Lama’s API and recalculates ratings based on pool statistics such as TVL (Total Value Locked) and APY (Annual Percentage Yield).
 	
@@ -12,7 +12,7 @@ Overview of Scripts
 	
     Output: Updates the pools.csv file with recalculated ratings for each pool.
 
-	2.	strategy_rating.js
+	2.strategy_rating.js
 	
     Purpose: Recalculates strategy ratings for each pool based on token tiers and existing pool ratings.
 	
@@ -20,7 +20,7 @@ Overview of Scripts
 	
     Output: Modifies the pools.csv file, adding or updating the strategy rating for each pool.
 
-	3.	allocation.py
+	3.allocation.py
 	
     Purpose: Determines the optimal allocation of funds across various pools, based on the strategy ratings and tiers of the protocols.
 	
@@ -45,7 +45,7 @@ Telegram Bot Functionality
 
 How the allocation.py Script Works:
 
-	
+
     Data Loading: Loads the pool data from pools.csv and protocol tiers from protocols.csv.
 	
     Calculation Logic:
