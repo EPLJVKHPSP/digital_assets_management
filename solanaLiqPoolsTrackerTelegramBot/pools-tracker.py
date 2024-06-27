@@ -6,10 +6,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import telebot
 
-bot_token = '6153821513:AAFXUf7tLDXhuAvYO8X3qxkaE8Zrjvo0rMk'
-chat_id = '-1001763350286'
+bot_token = 'YOUR-BOT-TOKEN'
+chat_id = 'YOUR-CHAT-ID'
 
-url = 'https://app.step.finance/en/dashboard?watching=B7PgJ3pRWJaabFjiDYd54d5jLgDASqJPPDmCnWwMU46Q'
+url = 'https://app.step.finance/en/dashboard?watching=YOUR-SOLANA-ADFRESS'
 
 options = Options()
 options.headless = True  # Run Chrome in headless mode
@@ -45,7 +45,7 @@ def main():
     # Getting the current APY
     apy = get_apy()
 
-    # Creating the message to be sent
+    # Creating the message to be sent = Use any pool as you want, this one is for example
     message = f"SOL-GMT (Whirlpool)\n(Orca - Solana)\nAPY: {apy}"
 
     # Sending the message
