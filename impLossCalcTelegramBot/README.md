@@ -1,33 +1,54 @@
-Telegram Crypto Liquidity Pool Impermanent Loss Calculator (Calc-2.0)
-This Python-based Telegram bot allows users to calculate the impermanent loss in a cryptocurrency liquidity pool. The bot interacts with users conversationally, requesting their initial and final token positions (names and quantities) along with the farmed commission, and then calculates the impermanent loss based on real-time cryptocurrency prices fetched from the CoinGecko API.
+Real-time Impermanent Loss Calculation in Telegram Bot
 
-New Features in Calc-2.0
-Migrated from a terminal-based application to an interactive Telegram bot interface.
-The bot fetches real-time cryptocurrency prices from CoinGecko API.
-Provided a multi-stage conversational interface for data input.
-Allows users to navigate back or cancel the operation at any stage.
-Calculates the impermanent loss based on user-provided data.
-Requirements
-Python 3.x
-A valid Telegram bot token.
-Usage
-Clone the repository or download the calculator_bot.py file to your local machine.
-Set your Telegram bot token in the script.
-Open a terminal or command prompt and navigate to the directory where calculator_bot.py is located.
-Run the following command to execute the script:
-bash
-Copy code
-python calculator_bot.py
-Interact with the bot on Telegram:
-Enter the tokens' names and quantities before and after liquidity provisioning.
-Enter the farmed commission.
-The bot will calculate the impermanent loss and display the result.
-Please note: For the security of the application, do not share the bot token publicly, as it's hardcoded in the main function. You might want to consider setting it through environment variables or a secure configuration file.
+This document provides an overview of the script designed to calculate the impermanent loss (IL) of liquidity provider (LP) positions in real-time using the CoinGecko API within a Telegram Bot. Unlike traditional financial calculators, this script facilitates interaction via a Telegram Bot interface, providing on-the-go accessibility and ease of use.
 
-Disclaimer: The information provided by this bot should be used for informational purposes only. The calculation is dependent on current prices which can fluctuate. Always do your own research before making any investment decisions.
-Follow the prompts on the terminal to enter the necessary information:
+Script Overview
 
-Enter the tokens and quantities in your position.
-Enter the current price.
-Enter the commissions from the liquidity pool.
-The script will calculate the impairment loss based on the provided information and display the result.
+The script utilizes the pycoingecko library to fetch real-time cryptocurrency prices, and the python-telegram-bot library to interact with users through a Telegram bot. It calculates the impermanent loss incurred in a two-token liquidity pool based on changes in the quantity of the tokens and their price fluctuations.
+
+Key Components
+
+1. Price Fetching:
+
+get_price(crypto_name): Fetches the current price of a cryptocurrency in USD from the CoinGecko API.
+
+2.	Telegram Bot Interaction:
+
+The bot provides a menu-driven interface to input the details of the user’s LP position, including the names and quantities of the tokens before and after the price change, and any farmed commission.
+
+3. Impermanent Loss Calculation:
+
+calculate_il(): Calculates the impermanent loss based on the provided data 
+
+Usage Workflow
+
+Starting the Bot:
+
+1. A user starts the bot using the /start command, which presents a menu with options to calculate impermanent loss or to navigate back.
+
+2. Entering LP Position Details:
+	•	The user selects the “IL Calc” option and enters the details of the LP position:
+	•	Names of Token1 and Token2.
+	•	Quantities of each token before and after the price change.
+	•	Any additional commission earned from farming.
+
+3. Calculation and Display:
+
+After all inputs are provided, the script calculates the impermanent loss and displays the result directly in the Telegram chat.
+
+Deployment and Environment Setup
+
+Dependencies:
+
+	•	Python packages: telegram, pycoingecko, python-telegram-bot.
+	•	A valid Telegram Bot Token set in the config.py file.
+	•	Running the Bot:
+	•	The script is executed on a server or a local machine where Python is installed.
+	•	Use the command python <script_name>.py to start the bot.
+	•	Security and Error Handling:
+	•	Error handling is integrated to manage API failures or incorrect user inputs.
+	•	Ensure secure handling of the bot token and robust exception handling to maintain operational integrity.
+
+Conclusion
+
+This Telegram Bot script offers a dynamic and user-friendly approach to tracking impermanent loss for cryptocurrency liquidity providers. By leveraging real-time data from the CoinGecko API, it provides valuable financial insights directly through a Telegram interface, making it accessible for users on mobile devices or desktops.
